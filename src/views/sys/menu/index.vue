@@ -7,14 +7,14 @@
       </el-col>
       <el-col :span="18">
         <el-button @click="getMenus">查询</el-button>
-        <el-button type="primary" @click="clickAddBT()">新增</el-button>
+        <el-button type="primary" @click="handleAdd()">新增</el-button>
         <el-button type="primary">修改</el-button>
         <el-button type="primary">删除</el-button>
       </el-col>
 
     </el-row>
 
-    <el-dialog title="新增" :visible.sync="addDialogVisible">
+    <el-dialog :title="dialogTitle" :visible.sync="addDialogVisible">
       <el-form label-width="80px" size="mini">
         <el-form-item label="类型">
           <el-radio-group v-model="menu.type" @change="changeType">
@@ -64,7 +64,7 @@
         </template>
 
         <el-form-item>
-          <el-button type="primary" @click="addRole">立即提交</el-button>
+          <el-button type="primary" @click="commitEvent">立即提交</el-button>
           <el-button @click="addDialogVisible=false">取消</el-button>
         </el-form-item>
       </el-form>
@@ -116,7 +116,7 @@
       <el-table-column label="操作" fixed="right" align="center">
         <template slot-scope="scope">
           <el-button type="text" size="small">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
+          <el-button type="text" size="small" @click="handleEdit(scope.index,scope.row)">编辑</el-button>
           <el-button type="text" size="small" @click="handleDelete(scope.index,scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -128,13 +128,14 @@
 
 <script>
 // import util from '@/libs/util.js'
-import { getTree, addMenu, deleteMenu } from '@/api/menu'
+import { getTree, addMenu, deleteMenu, editMenu } from '@/api/menu'
 // import qs from 'qs'
 import treeToArray from '@/utils/eval.js'
 export default {
   name: 'Menu',
   data() {
     return {
+      dialogTitle: '新增',
       menus: [],
       addDialogVisible: false,
       searchText: '',
@@ -191,9 +192,16 @@ export default {
     this.getMenus()
   },
   methods: {
-    clickAddBT() {
+    handleAdd() {
+      this.dialogTitle = '新增'
       this.addDialogVisible = true
       this.menu = { menuId: 0, name: '', type: '0', url: '', perms: '', parentId: '-1', parentName: '一级菜单', icon: '', orderNum: 0 }
+    },
+    handleEdit: function(index, row) {
+      var that = this
+      that.dialogTitle = '编辑'
+      that.addDialogVisible = true
+      that.menu = row
     },
     getMenus: function(event) {
       var that = this
@@ -204,43 +212,9 @@ export default {
         console.log(response)
         // that.menus = that.formatData()
       })
-      // this.$axios({
-      //   method: 'post',
-      //   url: '/sysmenu/getTree',
-      //   headers: { },
-      //   data: qs.stringify({ searchText: that.searchText, menuId: '-1' })
-      // })
-      //   .then(res => {
-      //     console.log(res.data)
-      //     if (res.data.code === 444) {
-      //       that.$message({
-      //         message: '登录过期，即将跳转登录页面',
-      //         type: 'warning',
-      //         duration: 5000,
-      //         onClose: function() {
-      //           window.location.href = 'http://localhost:8081/mt#/login'
-      //         }
-      //       })
-      //     } else {
-      //       that.menus = res.data.children
-      //       that.menus = that.formatData()
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log('err: ', err, err.response.data.message)
-      //     if (err.response.data.message.includes('Subject does not have permission')) {
-      //       this.$message({
-      //         message: '警告，没有操作权限',
-      //         type: 'warning'
-      //       })
-      //     }
-      //   })
     },
-    addRole: function(event) {
+    addMenu: function(event) {
       var that = this
-      // var sid = util.cookies.get('sessionId')
-      // console.log('sessionid==' + sid, that.menu)
-
       addMenu(that.menu).then(response => {
         that.getMenus()
         that.addDialogVisible = false
@@ -249,26 +223,24 @@ export default {
           type: 'success'
         })
       })
-      // this.$axios({
-      //   method: 'post',
-      //   url: '/sysmenu/add',
-      //   headers: { },
-      //   data: qs.stringify(that.menu)
-      // })
-      //   .then(res => {
-      //     console.log(res)
-      //     if (res.status === 200) {
-      //       that.getMenus()
-      //       that.addDialogVisible = false
-      //       that.$message({
-      //         message: '操作成功！',
-      //         type: 'success'
-      //       })
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log('err: ', err)
-      //   })
+    },
+    editMenu: function(event) {
+      var that = this
+      editMenu(that.menu).then(response => {
+        that.$message({
+          type: 'success',
+          message: '执行成功!'
+        })
+        that.getMenus()
+        that.addDialogVisible = false
+      })
+    },
+    commitEvent: function(event) {
+      if (this.dialogTitle === '新增') {
+        this.addMenu()
+      } else {
+        this.editMenu()
+      }
     },
     handleDelete: function(index, row) {
       var that = this

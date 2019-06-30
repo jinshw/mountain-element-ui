@@ -14,6 +14,13 @@ export function addRole(data) {
     data
   })
 }
+export function editRole(data) {
+  return request({
+    url: '/sysrole/edit',
+    method: 'post',
+    data
+  })
+}
 export function deleteRole(data) {
   return request({
     url: '/sysrole/delete',

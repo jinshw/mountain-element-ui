@@ -21,6 +21,13 @@ export function addMenu(data) {
     data
   })
 }
+export function editMenu(data) {
+  return request({
+    url: '/sysmenu/edit',
+    method: 'post',
+    data
+  })
+}
 export function deleteMenu(data) {
   return request({
     url: '/sysmenu/delete',
