@@ -7,9 +7,9 @@
       </el-col>
       <el-col :span="18">
         <el-button @click="getDepts">查询</el-button>
-        <el-button type="primary" @click="clickAdd()">新增</el-button>
-        <el-button type="primary">修改</el-button>
-        <el-button type="primary">删除</el-button>
+        <el-button type="primary" @click="handleAdd()">新增</el-button>
+        <!-- <el-button type="primary">修改</el-button>
+        <el-button type="primary">删除</el-button> -->
       </el-col>
     </el-row>
 
@@ -22,13 +22,13 @@
       <el-table-column label="操作" fixed="right" align="center">
         <template slot-scope="scope">
           <el-button type="text" size="small">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
+          <el-button type="text" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button type="text" size="small" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-dialog title="新增" :visible.sync="addDialogVisible">
+    <el-dialog :title="dialogTitle" :visible.sync="addDialogVisible" :close-on-click-modal="false">
       <el-form label-width="80px" size="mini">
         <el-form-item label="部门名称">
           <el-input v-model="dept.name" auto-complete="off" />
@@ -51,13 +51,13 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="addDept">立即提交</el-button>
+          <el-button type="primary" @click="commitEvent">立即提交</el-button>
           <el-button @click="addDialogVisible=false">取消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
 
-    <el-dialog title="上级部门" :visible.sync="treeDialog">
+    <el-dialog title="上级部门" :visible.sync="treeDialog" :close-on-click-modal="false">
       <el-container style="height: 400px;width:100%; border: 1px solid #eee;overflow-y: scroll;">
         <el-tree
           ref="tree"
@@ -78,13 +78,14 @@
 
 <script>
 // import util from '@/libs/util.js'
-import { getTree, addDept, deleteDept } from '@/api/dept'
+import { getTree, addDept, deleteDept, editDept } from '@/api/dept'
 // import qs from 'qs'
 import treeToArray from '@/utils/eval.js'
 export default {
   name: 'Dept',
   data() {
     return {
+      dialogTitle: '新增',
       searchText: '',
       addDialogVisible: false,
       dept: {
@@ -128,7 +129,7 @@ export default {
     this.getDepts()
   },
   methods: {
-    clickAdd() {
+    handleAdd() {
       this.addDialogVisible = true
       this.dept = {
         deptId: 0,
@@ -139,51 +140,17 @@ export default {
         delFlag: 0
       }
     },
+    handleEdit: function(index, row) {
+      var that = this
+      that.dialogTitle = '编辑'
+      that.addDialogVisible = true
+      that.dept = row
+    },
     getDepts: function(event) {
       var that = this
-      // var sid = util.cookies.get('sessionId')
-      // console.log('sessionid==' + sid)
       getTree({ deptId: '-1' }).then(response => {
-        console.log(response, 'getTree...')
         that.depts = response.data.children
-        // that.depts = that.formatData()
       })
-
-      // this.$axios({
-      //   method: 'post',
-      //   url: '/sysdept/getTree',
-      //   headers: { },
-      //   data: qs.stringify({ searchText: that.searchText, deptId: '-1' })
-      // })
-      //   .then(res => {
-      //     console.log(res.data)
-      //     if (res.data.code === 444) {
-      //       that.$message({
-      //         message: '登录过期，即将跳转登录页面',
-      //         type: 'warning',
-      //         duration: 5000,
-      //         onClose: function() {
-      //           window.location.href = 'http://localhost:8081/mt#/login'
-      //         }
-      //       })
-      //     } else {
-      //       that.depts = res.data.children
-      //       that.depts = that.formatData()
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log('err: ', err, err.response.data.message)
-      //     if (
-      //       err.response.data.message.includes(
-      //         'Subject does not have permission'
-      //       )
-      //     ) {
-      //       this.$message({
-      //         message: '警告，没有操作权限',
-      //         type: 'warning'
-      //       })
-      //     }
-      //   })
     },
     toggleExpanded: function(trIndex) {
       console.log(trIndex)
@@ -223,39 +190,11 @@ export default {
 
     showTree: function() {
       var that = this
-      // var sid = util.cookies.get('sessionId')
-      // console.log('sessionid==' + sid)
-
       getTree({ deptId: '-1' }).then(response => {
         console.log(response, 'getTree...')
         that.data2 = [response.data]
         that.treeDialog = true
       })
-
-      // this.$axios({
-      //   method: 'post',
-      //   url: '/sysdept/getTree',
-      //   headers: { },
-      //   data: qs.stringify({ searchText: that.searchText, deptId: '-1' })
-      // })
-      //   .then(res => {
-      //     console.log(res.data)
-      //     that.data2 = [res.data]
-      //     that.treeDialog = true
-      //   })
-      //   .catch(err => {
-      //     console.log('err: ', err, err.response.data.message)
-      //     if (
-      //       err.response.data.message.includes(
-      //         'Subject does not have permission'
-      //       )
-      //     ) {
-      //       this.$message({
-      //         message: '警告，没有操作权限',
-      //         type: 'warning'
-      //       })
-      //     }
-      //   })
     },
     saveParentDept: function() {
       this.currentNode = this.$refs.tree.getCurrentNode()
@@ -266,39 +205,29 @@ export default {
     },
     addDept: function(event) {
       var that = this
-      // var sid = util.cookies.get('sessionId')
-      // console.log('sessionid==' + sid, that.dept)
-
+      this.dialogTitle = '新增'
       addDept(that.dept).then(response => {
         that.getDepts()
         that.addDialogVisible = false
       })
-
-      // this.$axios({
-      //   method: 'post',
-      //   url: '/sysdept/add',
-      //   headers: {},
-      //   data: qs.stringify(that.dept)
-      // })
-      //   .then(res => {
-      //     console.log(res)
-      //     if (res.status === 200) {
-      //       that.getDepts()
-      //       that.addDialogVisible = false
-      //       that.$message({
-      //         message: '操作成功！',
-      //         type: 'success'
-      //       })
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log('err: ', err)
-      //   })
+    },
+    editDept: function(event) {
+      var that = this
+      this.dialogTitle = '编辑'
+      editDept(that.dept).then(response => {
+        that.getDepts()
+        that.addDialogVisible = false
+      })
+    },
+    commitEvent: function() {
+      if (this.dialogTitle === '新增') {
+        this.addDept()
+      } else {
+        this.editDept()
+      }
     },
     handleDelete: function(index, row) {
       var that = this
-      // var sid = util.cookies.get('sessionId')
-      // console.log(index, row, row.deptId, sid)
 
       this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -313,33 +242,6 @@ export default {
             })
             that.getDepts()
           })
-
-          // that
-          //   .$axios({
-          //     method: 'post',
-          //     url: '/sysdeptDelete',
-          //     headers: {},
-          //     data: qs.stringify({ deptId: row.deptId })
-          //   })
-          //   .then(res => {
-          //     console.log(res)
-          //     if (res.data.status === 200) {
-          //       that.$message({
-          //         type: 'success',
-          //         message: '删除成功!'
-          //       })
-          //       that.getDepts()
-          //     } else if (res.data.status === 201) {
-          //       that.$message({
-          //         type: 'info',
-          //         message: '不是子节点不能删除!'
-          //       })
-          //     }
-          //   })
-          //   .catch(err => {
-          //     console.group('结果..')
-          //     console.log('err: ', err)
-          //   })
         })
         .catch(() => {
           that.$message({

@@ -8,19 +8,19 @@
       <el-col :span="18">
         <el-button @click="getMenus">查询</el-button>
         <el-button type="primary" @click="handleAdd()">新增</el-button>
-        <el-button type="primary">修改</el-button>
-        <el-button type="primary">删除</el-button>
+        <!-- <el-button type="primary" @click="handleEdit()">修改</el-button>
+        <el-button type="primary">删除</el-button> -->
       </el-col>
 
     </el-row>
 
-    <el-dialog :title="dialogTitle" :visible.sync="addDialogVisible">
+    <el-dialog :title="dialogTitle" :visible.sync="addDialogVisible" :close-on-click-modal="false">
       <el-form label-width="80px" size="mini">
         <el-form-item label="类型">
           <el-radio-group v-model="menu.type" @change="changeType">
-            <el-radio label="0">目录</el-radio>
-            <el-radio label="1">菜单</el-radio>
-            <el-radio label="2">按钮</el-radio>
+            <el-radio :label="0">目录</el-radio>
+            <el-radio :label="1">菜单</el-radio>
+            <el-radio :label="2">按钮</el-radio>
           </el-radio-group>
         </el-form-item>
         <template v-if="menu.type=='0'">
@@ -140,7 +140,6 @@ export default {
       addDialogVisible: false,
       searchText: '',
       menu: { menuId: 0, name: '', type: '0', url: '', perms: '', parentId: '-1', parentName: '一级菜单', icon: '', orderNum: 0 },
-
       data2: [],
       defaultProps: {
         children: 'children',
@@ -195,7 +194,7 @@ export default {
     handleAdd() {
       this.dialogTitle = '新增'
       this.addDialogVisible = true
-      this.menu = { menuId: 0, name: '', type: '0', url: '', perms: '', parentId: '-1', parentName: '一级菜单', icon: '', orderNum: 0 }
+      this.menu = { menuId: 0, name: '', type: 0, url: '', perms: '', parentId: '-1', parentName: '一级菜单', icon: '', orderNum: 0 }
     },
     handleEdit: function(index, row) {
       var that = this
@@ -244,9 +243,6 @@ export default {
     },
     handleDelete: function(index, row) {
       var that = this
-      // var sid = util.cookies.get('sessionId')
-      // console.log(index, row, row.menuId, sid)
-
       this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -260,33 +256,6 @@ export default {
             })
             that.getMenus()
           })
-
-          // that
-          //   .$axios({
-          //     method: 'post',
-          //     url: '/sysmenuDelete',
-          //     headers: { },
-          //     data: qs.stringify({ id: row.menuId })
-          //   })
-          //   .then(res => {
-          //     console.log(res)
-          //     if (res.data.status === 200) {
-          //       that.$message({
-          //         type: 'success',
-          //         message: '删除成功!'
-          //       })
-          //       that.getMenus()
-          //     } else if (res.data.status === 201) {
-          //       that.$message({
-          //         type: 'info',
-          //         message: '不是子节点不能删除!'
-          //       })
-          //     }
-          //   })
-          //   .catch(err => {
-          //     console.group('结果..')
-          //     console.log('err: ', err)
-          //   })
         })
         .catch(() => {
           that.$message({
@@ -297,33 +266,10 @@ export default {
     },
     showMenuTree: function() {
       var that = this
-      // var sid = util.cookies.get('sessionId')
-      // console.log('sessionid==' + sid)
       getTree({ searchText: that.searchText, menuId: '-1' }).then(response => {
         that.data2 = [response.data]
         that.menuTreeDialog = true
       })
-
-      // this.$axios({
-      //   method: 'post',
-      //   url: '/sysmenu/getTree',
-      //   headers: { },
-      //   data: qs.stringify({ searchText: that.searchText, menuId: '-1' })
-      // })
-      //   .then(res => {
-      //     console.log(res.data)
-      //     that.data2 = [res.data]
-      //     that.menuTreeDialog = true
-      //   })
-      //   .catch(err => {
-      //     console.log('err: ', err, err.response.data.message)
-      //     if (err.response.data.message.includes('Subject does not have permission')) {
-      //       this.$message({
-      //         message: '警告，没有操作权限',
-      //         type: 'warning'
-      //       })
-      //     }
-      //   })
     },
     saveParentMenu: function() {
       this.currentNode = this.$refs.tree.getCurrentNode()

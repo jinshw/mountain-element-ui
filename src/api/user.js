@@ -25,7 +25,6 @@ export function logout() {
 }
 
 export function getList(data) {
-  console.log('555555555555555')
   return request({
     url: '/sysuser/list',
     method: 'post',
@@ -33,7 +32,6 @@ export function getList(data) {
   })
 }
 export function addUser(data) {
-  console.log(data, '...........')
   return request({
     url: '/sysuser/adduser',
     method: 'post',
@@ -41,9 +39,15 @@ export function addUser(data) {
   })
 }
 export function deleteUser(data) {
-  console.log(data, '...........')
   return request({
     url: '/sysuser/delete',
+    method: 'post',
+    data
+  })
+}
+export function editUser(data) {
+  return request({
+    url: '/sysuser/edit',
     method: 'post',
     data
   })

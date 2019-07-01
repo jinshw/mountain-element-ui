@@ -14,6 +14,13 @@ export function addDept(data) {
     data
   })
 }
+export function editDept(data) {
+  return request({
+    url: '/sysdept/edit',
+    method: 'post',
+    data
+  })
+}
 export function deleteDept(data) {
   return request({
     url: '/sysdept/delete',
