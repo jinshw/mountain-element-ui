@@ -1,6 +1,6 @@
 import { login, logout, getInfo, getList, addUser } from '@/api/user'
-import { getToken, setToken, setCookies, removeToken } from '@/utils/auth'
-import { resetRouter } from '@/router'
+import { getToken, setToken, setCookies, removeToken, setLocalStorage, removeLocalStorage } from '@/utils/auth'
+import { resetRouter, remoteRouter } from '@/router'
 
 const state = {
   token: getToken(),
@@ -27,12 +27,15 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
+        console.log('user login..111', response, data)
         commit('SET_TOKEN', data.token)
         setToken(data.token)
         if (response.data.sessionId !== undefined) {
           setCookies('sessionId', response.data.sessionId)
         }
-        resolve()
+        setLocalStorage('router', response.sysMenus.children)
+        remoteRouter(response.sysMenus)
+        resolve(response)
       }).catch(error => {
         reject(error)
       })
@@ -68,6 +71,7 @@ const actions = {
         commit('SET_TOKEN', '')
         removeToken()
         resetRouter()
+        removeLocalStorage('router')
         resolve()
       }).catch(error => {
         reject(error)

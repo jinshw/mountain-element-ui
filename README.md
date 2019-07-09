@@ -1,89 +1,174 @@
-# vue-admin-template
+# mountain-element-ui
 
-English | [简体中文](./README-zh.md)
+## 项目概述
 
-> A minimal vue admin template with Element UI & axios & iconfont & permission control & lint
+```
+mountain-element-ui 是mountain 项目的前端工程，是基于vue-admin-template开源项目扩展开发的，实现管理系统最基础的模块开发
+```
 
-**Live demo:** http://panjiachen.github.io/vue-admin-template
+## 动态路由添加
+
+* 遇到问题
+
+  1. 后台返回json数据，怎样转换成router
+
+     解决方法：
+
+     ```javascript
+     // 变量后台返回的菜单tree，转换成前端router
+     function getMenuTree(list) {
+       const remoteMenuList = []
+       for (const index in list) {
+         let obj = {}
+         const menu = list[index]
+         if (menu.type === 0) { // 目录
+           obj.path = menu.url
+           obj.component = Layout
+           obj.meta = {
+             title: menu.name,
+             icon: menu.icon
+           }
+         } else if (menu.type === 1) { // 菜单
+           var urlArr = menu.url.split(';')
+           obj = {
+             path: urlArr[0],
+             component: _import(trim(urlArr[1])),
+             name: urlArr[0],
+             meta: {
+               title: menu.name,
+               icon: menu.icon
+             }
+           }
+         } else if (menu.type === 2) { // 按钮
+           console.log(menu.type)
+         }
+         if (list[index].children.length !== 0) {
+           const tempChildren = getMenuTree(list[index].children)
+           obj.children = tempChildren
+         }
+         if (Object.keys(obj).length > 0) {
+           remoteMenuList.push(obj)
+         }
+       }
+       return remoteMenuList
+     }
+     ```
+
+     
+
+  2. 怎样动态添加路由
+
+     解决方法：
+
+     ```javascript
+     router.addRoutes(router.options.routes)// 动态添加路由
+     ```
+
+     
+
+  3. 刷新页面不能添加路由菜单
+
+     解决方法：把后台返回的菜单tree保存在`LocalStorage`，在`router.beforeEach()` 方法中获取本地数据，并添加到路由上。
+
+     ```javascript
+     // 保存后台菜单tree
+     setLocalStorage('router', response.sysMenus.children)
+     
+     // permission.js 文件中 router.beforeEach
+     router.beforeEach(async(to, from, next) => {
+       const initRouterList = getLocalStorage('initRouter')
+     
+       if (router.options.routes.length <= initRouterList.length) {// 必须添加，否则死循环
+         const list = getLocalStorage('router')
+         const remoteRouter = menuTreeToPageMenu(list)
+         // 动态添加路由
+         if (remoteRouter !== null && remoteRouter !== undefined) {
+           for (let i = 0; i < remoteRouter.length; i++) {
+             var isFlag = router.options.routes.some(function(obj) {
+               if (obj.path === remoteRouter[i].path) {
+                 return true
+               }
+             })
+             if (!isFlag) {
+               router.options.routes.push(remoteRouter[i])
+             }
+           }
+           router.addRoutes(router.options.routes)
+           next({ ...to, replace: true })
+         }
+       }
+       ....
+       
+     }
+     
+     ```
+
+     
+
+  4. 添加新菜单并且赋权后，重新登录不显示新增菜单
+
+     解决方法：
+
+     ```javascript
+     // src/router/index.js 中获取localstorage获取initRouter
+     const initRouter = getLocalStorage('initRouter')
+     router.options.routes = initRouter
+     ```
+
+     
+
+* 
 
 
-**The current version is `v4.0+` build on `vue-cli`. If you want to use the old version , you can switch branch to [tag/3.11.0](https://github.com/PanJiaChen/vue-admin-template/tree/tag/3.11.0), it does not rely on `vue-cli`**
+
+----
+
+---
 
 ## Build Setup
 
-
 ```bash
-# clone the project
+# 参考项目
 git clone https://github.com/PanJiaChen/vue-admin-template.git
 
-# enter the project directory
+# 进入项目目录
 cd vue-admin-template
 
-# install dependency
+# 安装依赖
 npm install
 
-# develop
+# 建议不要直接使用 cnpm 安装以来，会有各种诡异的 bug。可以通过如下操作解决 npm 下载速度慢的问题
+npm install --registry=https://registry.npm.taobao.org
+
+# 启动服务
 npm run dev
 ```
 
-This will automatically open http://localhost:9528
+浏览器访问 [http://localhost:9528](http://localhost:9528)
 
-## Build
+## 发布
 
 ```bash
-# build for test environment
+# 构建测试环境
 npm run build:stage
 
-# build for production environment
+# 构建生产环境
 npm run build:prod
 ```
 
-## Advanced
+## 其它
 
 ```bash
-# preview the release environment effect
+# 预览发布环境效果
 npm run preview
 
-# preview the release environment effect + static resource analysis
+# 预览发布环境效果 + 静态资源分析
 npm run preview -- --report
 
-# code format check
+# 代码格式检查
 npm run lint
 
-# code format check and auto fix
+# 代码格式检查并自动修复
 npm run lint -- --fix
 ```
 
-Refer to [Documentation](https://panjiachen.github.io/vue-element-admin-site/guide/essentials/deploy.html) for more information
-
-## Demo
-
-![demo](https://github.com/PanJiaChen/PanJiaChen.github.io/blob/master/images/demo.gif)
-
-## Extra
-
-If you want router permission && generate menu by user roles , you can use this branch [permission-control](https://github.com/PanJiaChen/vue-admin-template/tree/permission-control)
-
-For `typescript` version, you can use [vue-typescript-admin-template](https://github.com/Armour/vue-typescript-admin-template) (Credits: [@Armour](https://github.com/Armour))
-
-## Related Project
-
-[vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)
-
-[electron-vue-admin](https://github.com/PanJiaChen/electron-vue-admin)
-
-[vue-typescript-admin-template](https://github.com/Armour/vue-typescript-admin-template)
-
-## Browsers support
-
-Modern browsers and Internet Explorer 10+.
-
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="IE / Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>IE / Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Safari |
-| --------- | --------- | --------- | --------- |
-| IE10, IE11, Edge| last 2 versions| last 2 versions| last 2 versions
-
-## License
-
-[MIT](https://github.com/PanJiaChen/vue-admin-template/blob/master/LICENSE) license.
-
-Copyright (c) 2017-present PanJiaChen

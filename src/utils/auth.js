@@ -21,3 +21,15 @@ export function getCookies(key) {
 export function removeToken() {
   return Cookies.remove(TokenKey)
 }
+
+export function setLocalStorage(name, data) { // localStorage 存储数组对象的方法
+  localStorage.setItem(name, JSON.stringify(data))
+}
+
+export function getLocalStorage(name) { // localStorage 获取数组对象的方法
+  return JSON.parse(window.localStorage.getItem(name))
+}
+
+export function removeLocalStorage(name) { // localStorage 移除数组对象的方法
+  localStorage.removeItem(name)
+}

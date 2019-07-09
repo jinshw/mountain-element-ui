@@ -17,8 +17,11 @@
         <el-form-item label="登录账号" prop="username">
           <el-input v-model="user.username" auto-complete="off" />
         </el-form-item>
-        <el-form-item label="登录密码" prop="password">
-          <el-input v-model="user.password" type="password" auto-complete="off" />
+        <el-form-item label="登录密码" prop="password" :style="{display:showPassWordInput}">
+          <el-input ref="password" v-model="user.password" :type="passwordType" auto-complete="off" />
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="user.email" type="email" auto-complete="off" />
@@ -28,7 +31,7 @@
         </el-form-item>
         <el-form-item label="角色" prop="roles">
           <el-select
-            v-model="user.roles"
+            v-model="rolesSelect"
             style="width:100%;"
             multiple
             filterable
@@ -122,7 +125,7 @@ export default {
           { min: 3, max: 50, message: '长度在3 到 30 个字符', trigger: ['blur', 'change'] }
         ],
         password: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { required: true, message: '请输入登录密码', trigger: 'blur' },
           { min: 4, max: 50, message: '长度在 4 到 50 个字符', trigger: ['blur', 'change'] }
         ],
         email: [
@@ -130,7 +133,10 @@ export default {
           { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
         ]
       },
-      roles: []
+      roles: [],
+      rolesSelect: [],
+      passwordType: 'password',
+      showPassWordInput: 'display'
     }
   },
   mounted() {
@@ -189,14 +195,18 @@ export default {
     },
     handleAdd() {
       this.dialogTitle = '新增'
+      this.showPassWordInput = 'display'
+      this.passwordType = 'password'
       this.addDialogVisible = true
       this.user = { userId: 0, username: '', password: '', email: '', mobile: '', status: 1, deptId: '' }
     },
     handleEdit: function(index, row) {
       var that = this
+      this.showPassWordInput = 'none'
       that.dialogTitle = '编辑'
       that.addDialogVisible = true
       that.user = row
+      that.rolesSelect = that.user.roles.slice()
     },
     editUser: function(event) {
       var that = this
@@ -210,11 +220,14 @@ export default {
       })
     },
     commitEvent: function(userRef) {
+      var that = this
       this.$refs[userRef].validate((valid) => {
         if (valid) {
+          that.user.roles = that.rolesSelect
           if (this.dialogTitle === '新增') {
             this.addUser()
           } else {
+            that.user.password = ''
             this.editUser()
           }
         } else {
@@ -231,13 +244,33 @@ export default {
     },
     rolesSelectChange: function(val) {
       console.log('rolesSelectChange...', val)
-      this.user.roles = val
+      this.rolesSelect = val
+      console.log('user.roles...', this.user.roles)
+    },
+    showPwd() {
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
+      } else {
+        this.passwordType = 'password'
+      }
+      this.$nextTick(() => {
+        this.$refs.password.focus()
+      })
     }
   }
 }
 </script>
 
-<style lang="sass" scoped>
-
+<style lang="scss" scoped>
+$dark_gray:#889aa4;
+.show-pwd {
+  position: absolute;
+  right: 10px;
+  top: 0px;
+  font-size: 16px;
+  color: $dark_gray;
+  cursor: pointer;
+  user-select: none;
+}
 </style>
 

@@ -30,6 +30,9 @@
           <el-form-item label="上级菜单">
             <el-input v-model="menu.parentName" auto-complete="off" readonly="readonly" @click.native="showMenuTree" />
           </el-form-item>
+          <el-form-item label="菜单路由">
+            <el-input v-model="menu.url" auto-complete="off" />
+          </el-form-item>
           <el-form-item label="排序号">
             <el-input-number v-model="menu.orderNum" :step="1" :min="0" :max="1000000" controls-position="right" />
           </el-form-item>
@@ -57,6 +60,9 @@
           </el-form-item>
           <el-form-item label="上级菜单">
             <el-input v-model="menu.parentName" auto-complete="off" readonly="readonly" @click.native="showMenuTree" />
+          </el-form-item>
+          <el-form-item label="菜单路由">
+            <el-input v-model="menu.url" auto-complete="off" />
           </el-form-item>
           <el-form-item label="授权标识">
             <el-input v-model="menu.perms" auto-complete="off" />
@@ -304,9 +310,9 @@ export default {
       return show ? 'animation:treeTableShow 1s;-webkit-animation:treeTableShow 1s;' : 'display:none;'
     },
     // 图标显示
-    iconShow(index, record) {
-      return (index === 0 && record.children && record.children.length > 0)
-    },
+    // iconShow(index, record) {
+    //   return (index === 0 && record.children && record.children.length > 0)
+    // },
     changeType() {
       console.log(this.menu.type)
     }

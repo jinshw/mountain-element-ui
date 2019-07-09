@@ -1,9 +1,10 @@
 import router from './router'
+import { menuTreeToPageMenu } from '@/router'
 import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
-import { getToken } from '@/utils/auth' // get token from cookie
+import { getToken, getLocalStorage } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
@@ -11,6 +12,30 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 const whiteList = ['/login'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
+  console.log('beforeEach....')
+
+  const initRouterList = getLocalStorage('initRouter')
+
+  if (router.options.routes.length <= initRouterList.length) {
+    const list = getLocalStorage('router')
+    const remoteRouter = menuTreeToPageMenu(list)
+    // 动态添加路由
+    if (remoteRouter !== null && remoteRouter !== undefined) {
+      for (let i = 0; i < remoteRouter.length; i++) {
+        var isFlag = router.options.routes.some(function(obj) {
+          if (obj.path === remoteRouter[i].path) {
+            return true
+          }
+        })
+        if (!isFlag) {
+          router.options.routes.push(remoteRouter[i])
+        }
+      }
+      router.addRoutes(router.options.routes)
+      next({ ...to, replace: true })
+    }
+  }
+
   // start progress bar
   NProgress.start()
 
@@ -62,3 +87,4 @@ router.afterEach(() => {
   // finish progress bar
   NProgress.done()
 })
+

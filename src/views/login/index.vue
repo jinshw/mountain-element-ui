@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">登录</h3>
       </div>
 
       <el-form-item prop="username">
@@ -41,11 +41,11 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
       <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
+        <span> password: 123456</span>
       </div>
 
     </el-form>
@@ -53,14 +53,16 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+// import { validUsername } from '@/utils/validate'
+import { Message } from 'element-ui'
 
 export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+      // if (!validUsername(value)) {
+      if (value.length > 20 || value.length < 4) {
+        callback(new Error('请输入4到20位的有效用户名'))
       } else {
         callback()
       }
@@ -75,7 +77,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '123456'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -110,7 +112,16 @@ export default {
         if (valid) {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm).then(response => {
-            console.log('www.baidu.com')
+            console.log('user/login..', response)
+            if (response.status === 30001) {
+              Message({
+                message: response.message || 'Error',
+                type: 'error',
+                duration: 5 * 1000
+              })
+              this.loading = false
+              return
+            }
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
           }).catch((err) => {
