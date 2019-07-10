@@ -15,9 +15,9 @@ router.beforeEach(async(to, from, next) => {
   console.log('beforeEach....')
 
   const initRouterList = getLocalStorage('initRouter')
+  const list = getLocalStorage('router')
 
-  if (router.options.routes.length <= initRouterList.length) {
-    const list = getLocalStorage('router')
+  if (router.options.routes.length <= initRouterList.length && list != null) {
     const remoteRouter = menuTreeToPageMenu(list)
     // 动态添加路由
     if (remoteRouter !== null && remoteRouter !== undefined) {
