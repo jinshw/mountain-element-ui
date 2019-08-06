@@ -195,7 +195,6 @@ export default {
     loadData: function(pageNum, pageSize) {
       const that = this
       queryjob({ pageNum: pageNum, pageSize: pageSize }).then(response => {
-        console.log('wwwwww', response)
         that.tableData = response.JobAndTrigger.list
         that.totalCount = response.number
       })

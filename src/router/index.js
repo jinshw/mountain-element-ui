@@ -34,6 +34,17 @@ const _import = require('./_import_' + process.env.NODE_ENV)
  */
 export const constantRoutes = [
   {
+    path: '/redirect',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/redirect/:path*',
+        component: () => import('@/views/redirect/index')
+      }
+    ]
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
@@ -95,6 +106,8 @@ export function remoteRouter(menuList) {
       router.options.routes.push(list[i])
     }
   }
+  console.log('.....mmm..........')
+  console.log(router.options.routes)
   router.addRoutes(router.options.routes)
 }
 
