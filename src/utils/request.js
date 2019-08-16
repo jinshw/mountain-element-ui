@@ -79,7 +79,26 @@ service.interceptors.response.use(
         return
       }
 
-      return Promise.reject(new Error(res.message || 'Error'))
+      // const promise = Promise.reject(new Error(res.message || 'Error'))
+
+      // promise.catch(function(error) {
+      //   console.log('98888', error)
+      // })
+      // promise.then((resp) => {
+      //   return resp
+      // }, (resp) => {
+      //   return resp
+      // })
+
+      const promise = new Promise(function(resolve, reject) {
+        reject(new Error(res.message || 'Error'))
+      })
+      promise.catch(function(error) {
+        console.log(error)
+      })
+
+      return promise
+      // return Promise.reject(new Error(res.message || 'Error'))
     } else {
       return res
     }

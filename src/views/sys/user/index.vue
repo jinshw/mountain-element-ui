@@ -3,7 +3,7 @@
     <h1 class="d2-mt-0">用户管理</h1>
     <el-row class="d2-mb" :gutter="10">
       <el-col :span="6">
-        <el-input v-model="searchText" type="text" placeholder="账号" />
+        <el-input v-model.trim="searchText" type="text" placeholder="账号" />
       </el-col>
       <el-col :span="18">
         <el-button @click="getUsers">查询</el-button>
@@ -136,7 +136,7 @@ export default {
       roles: [],
       rolesSelect: [],
       passwordType: 'password',
-      showPassWordInput: 'display'
+      showPassWordInput: 'block'
     }
   },
   mounted() {
@@ -145,8 +145,11 @@ export default {
   methods: {
     getUsers: function(event) {
       const that = this
+      this.user.username = this.searchText
+      console.log(that.user, this.searchText, 'eeeeeeeeeeeee')
+
       this.$store
-        .dispatch('user/list', {})
+        .dispatch('user/list', that.user)
         .then(datas => {
           that.users = datas
         })
@@ -161,6 +164,7 @@ export default {
       this.$store
         .dispatch('user/add', that.user)
         .then(datas => {
+          that.resetObject()
           that.getUsers()
           that.addDialogVisible = false
         })
@@ -195,10 +199,11 @@ export default {
     },
     handleAdd() {
       this.dialogTitle = '新增'
-      this.showPassWordInput = 'display'
+      this.showPassWordInput = 'block'
       this.passwordType = 'password'
       this.addDialogVisible = true
       this.user = { userId: 0, username: '', password: '', email: '', mobile: '', status: 1, deptId: '' }
+      this.rolesSelect = []
     },
     handleEdit: function(index, row) {
       var that = this
@@ -215,6 +220,7 @@ export default {
           type: 'success',
           message: '执行成功!'
         })
+        that.resetObject()
         that.getUsers()
         that.addDialogVisible = false
       })
@@ -256,6 +262,9 @@ export default {
       this.$nextTick(() => {
         this.$refs.password.focus()
       })
+    },
+    resetObject: function() {
+      this.user = {}
     }
   }
 }

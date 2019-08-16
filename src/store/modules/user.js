@@ -92,7 +92,7 @@ const actions = {
   list({ commit }, params) {
     // const { username, password } = params
     return new Promise((resolve, reject) => {
-      getList({ params }).then(response => {
+      getList(params).then(response => {
         const { data } = response
         console.log('list.......', data)
         resolve(data)

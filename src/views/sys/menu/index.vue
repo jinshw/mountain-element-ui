@@ -3,7 +3,7 @@
     <h1 class="d2-mt-0">菜单管理</h1>
     <el-row class="d2-mb" :gutter="10">
       <el-col :span="6">
-        <el-input v-model="searchText" type="text" placeholder="菜单名称" />
+        <el-input v-model="searchText" type="text" placeholder="菜单名称" :disabled="true" />
       </el-col>
       <el-col :span="18">
         <el-button @click="getMenus">查询</el-button>

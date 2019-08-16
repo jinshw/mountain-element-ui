@@ -115,7 +115,8 @@ export default {
   methods: {
     getRoles: function(event) {
       var that = this
-      getList({}).then(response => {
+      this.role.roleName = this.searchText
+      getList(this.role).then(response => {
         that.roles = response.data
       })
       that.getMenuTree()
@@ -131,6 +132,7 @@ export default {
           type: 'success',
           message: '执行成功!'
         })
+        that.resetObject()
         that.getRoles()
         that.addDialogVisible = false
       })
@@ -144,6 +146,7 @@ export default {
           type: 'success',
           message: '执行成功!'
         })
+        that.resetObject()
         that.getRoles()
         that.addDialogVisible = false
       })
@@ -252,6 +255,9 @@ export default {
         that.getMenuTreeCheckedKeys(arr, node.children[index])
       }
       arr.push(node.menuId)
+    },
+    resetObject: function() {
+      this.role = { roleName: '', remark: '', roleId: 0, menus: [] }
     }
   }
 }
