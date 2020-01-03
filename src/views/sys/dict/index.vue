@@ -129,13 +129,15 @@ export default {
       var that = this
       this.dialogTitle = '新增'
       addDict(that.dict).then(response => {
-        that.$message({
-          type: 'success',
-          message: that.dialogTitle + '成功!'
-        })
-        that.resetDict()
-        that.getDicts()
-        that.addDialogVisible = false
+        if (response) {
+          that.$message({
+            type: 'success',
+            message: that.dialogTitle + '成功!'
+          })
+          that.resetDict()
+          that.getDicts()
+          that.addDialogVisible = false
+        }
       })
     },
     editDict: function(event) {
@@ -164,11 +166,13 @@ export default {
       })
         .then(() => {
           deleteDict({ dictId: row.dictId }).then(response => {
-            that.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            that.getDicts()
+            if (response) {
+              that.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              that.getDicts()
+            }
           })
         })
         .catch(() => {

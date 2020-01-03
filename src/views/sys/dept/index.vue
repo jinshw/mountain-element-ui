@@ -236,11 +236,13 @@ export default {
       })
         .then(() => {
           deleteDept({ deptId: row.deptId }).then(response => {
-            that.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            that.getDepts()
+            if (response) {
+              that.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              that.getDepts()
+            }
           })
         })
         .catch(() => {

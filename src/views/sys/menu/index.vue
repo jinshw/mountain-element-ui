@@ -221,23 +221,27 @@ export default {
     addMenu: function(event) {
       var that = this
       addMenu(that.menu).then(response => {
-        that.getMenus()
-        that.addDialogVisible = false
-        that.$message({
-          message: '操作成功！',
-          type: 'success'
-        })
+        if (response) {
+          that.getMenus()
+          that.addDialogVisible = false
+          that.$message({
+            message: '操作成功！',
+            type: 'success'
+          })
+        }
       })
     },
     editMenu: function(event) {
       var that = this
       editMenu(that.menu).then(response => {
-        that.$message({
-          type: 'success',
-          message: '执行成功!'
-        })
-        that.getMenus()
-        that.addDialogVisible = false
+        if (response) {
+          that.$message({
+            type: 'success',
+            message: '执行成功!'
+          })
+          that.getMenus()
+          that.addDialogVisible = false
+        }
       })
     },
     commitEvent: function(event) {
@@ -256,11 +260,13 @@ export default {
       })
         .then(() => {
           deleteMenu({ menuId: row.menuId }).then(response => {
-            that.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            that.getMenus()
+            if (response) {
+              that.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              that.getMenus()
+            }
           })
         })
         .catch(() => {

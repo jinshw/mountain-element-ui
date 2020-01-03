@@ -14,6 +14,7 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(
   config => {
+    config.headers['X-Requested-With'] = 'XMLHttpRequest'
     // do something before request is sent
     const sessionId = getCookies('sessionId')
     if (store.getters.token) {
@@ -51,15 +52,14 @@ service.interceptors.response.use(
 
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 20000) {
-      Message({
-        message: res.message || 'Error',
-        type: 'error',
-        duration: 5 * 1000
-      })
+      // Message({
+      //   message: res.message || 'Error',
+      //   type: 'error',
+      //   duration: 5 * 1000
+      // })
 
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
+      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;50008 system err
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-        // to re-login
         MessageBox.confirm('您已经注销，您可以取消以停留在此页面，或再次登录', '确认注销', {
           confirmButtonText: '重新登录',
           cancelButtonText: '取消',
@@ -69,14 +69,13 @@ service.interceptors.response.use(
             location.reload()
           })
         })
-      }
-      if (res.code === 600) {
+      } else if (res.code === 50015) { // not have permission
         Message({
           message: '您没有操作权限',
           type: 'warning',
           duration: 5 * 1000
         })
-        return
+        return false
       }
 
       // const promise = Promise.reject(new Error(res.message || 'Error'))

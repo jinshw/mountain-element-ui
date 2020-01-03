@@ -128,13 +128,15 @@ export default {
       that.role.depts = this.$refs.deptTree.getCheckedNodes()
       console.log(that.role.menus, that.role.depts)
       addRole(that.role).then(response => {
-        that.$message({
-          type: 'success',
-          message: '执行成功!'
-        })
-        that.resetObject()
-        that.getRoles()
-        that.addDialogVisible = false
+        if (response) {
+          that.$message({
+            type: 'success',
+            message: '执行成功!'
+          })
+          that.resetObject()
+          that.getRoles()
+          that.addDialogVisible = false
+        }
       })
     },
     editRole: function(event) {
@@ -142,13 +144,15 @@ export default {
       that.role.menus = this.$refs.menuTree.getCheckedNodes()
       that.role.depts = this.$refs.deptTree.getCheckedNodes()
       editRole(that.role).then(response => {
-        that.$message({
-          type: 'success',
-          message: '执行成功!'
-        })
-        that.resetObject()
-        that.getRoles()
-        that.addDialogVisible = false
+        if (response) {
+          that.$message({
+            type: 'success',
+            message: '执行成功!'
+          })
+          that.resetObject()
+          that.getRoles()
+          that.addDialogVisible = false
+        }
       })
     },
     commitEvent: function(event) {
@@ -167,11 +171,13 @@ export default {
       })
         .then(() => {
           deleteRole({ roleId: row.roleId }).then(response => {
-            that.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            that.getRoles()
+            if (response) {
+              that.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              that.getRoles()
+            }
           })
         })
         .catch(() => {

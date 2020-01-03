@@ -182,12 +182,13 @@ export default {
         .then(() => {
           console.log({ userId: row.userId }, 'delete 111111111')
           deleteUser({ userId: row.userId }).then(response => {
-            console.log(response, 'delete....')
-            that.$message({
-              type: 'success',
-              message: '执行成功'
-            })
-            that.getUsers()
+            if (response) {
+              that.$message({
+                type: 'success',
+                message: '执行成功'
+              })
+              that.getUsers()
+            }
           })
         })
         .catch(() => {
@@ -216,13 +217,15 @@ export default {
     editUser: function(event) {
       var that = this
       editUser(that.user).then(response => {
-        that.$message({
-          type: 'success',
-          message: '执行成功!'
-        })
-        that.resetObject()
-        that.getUsers()
-        that.addDialogVisible = false
+        if (response) {
+          that.$message({
+            type: 'success',
+            message: '执行成功!'
+          })
+          that.resetObject()
+          that.getUsers()
+          that.addDialogVisible = false
+        }
       })
     },
     commitEvent: function(userRef) {

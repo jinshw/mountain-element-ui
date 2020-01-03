@@ -107,28 +107,34 @@ export default {
     startCron: function() {
       const that = this
       startCron().then(response => {
-        that.$message({
-          type: 'success',
-          message: '执行成功!'
-        })
+        if (response) {
+          that.$message({
+            type: 'success',
+            message: '执行成功!'
+          })
+        }
       })
     },
     stopCron: function() {
       const that = this
       stopCron().then(response => {
-        that.$message({
-          type: 'success',
-          message: '执行成功!'
-        })
+        if (response) {
+          that.$message({
+            type: 'success',
+            message: '执行成功!'
+          })
+        }
       })
     },
     changeCron10: function() {
       const that = this
       changeCron10().then(response => {
-        that.$message({
-          type: 'success',
-          message: '执行成功!'
-        })
+        if (response) {
+          that.$message({
+            type: 'success',
+            message: '执行成功!'
+          })
+        }
       })
     },
 
@@ -163,14 +169,14 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          console.log({ userId: row.userId }, 'delete 111111111')
           deleteUser({ userId: row.userId }).then(response => {
-            console.log(response, 'delete....')
-            that.$message({
-              type: 'success',
-              message: '执行成功'
-            })
-            that.getUsers()
+            if (response) {
+              that.$message({
+                type: 'success',
+                message: '执行成功'
+              })
+              that.getUsers()
+            }
           })
         })
         .catch(() => {
@@ -198,12 +204,14 @@ export default {
     editUser: function(event) {
       var that = this
       editUser(that.user).then(response => {
-        that.$message({
-          type: 'success',
-          message: '执行成功!'
-        })
-        that.getUsers()
-        that.addDialogVisible = false
+        if (response) {
+          that.$message({
+            type: 'success',
+            message: '执行成功!'
+          })
+          that.getUsers()
+          that.addDialogVisible = false
+        }
       })
     },
     commitEvent: function(userRef) {
