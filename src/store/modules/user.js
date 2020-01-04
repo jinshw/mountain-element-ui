@@ -26,15 +26,18 @@ const actions = {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        console.log('user login..111', response, data)
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        if (response.data.sessionId !== undefined) {
-          setCookies('sessionId', response.data.sessionId)
+        if (response.status !== 30001) {
+          const { data } = response
+          console.log('user login..111', response, data)
+          commit('SET_TOKEN', data.token)
+          setToken(data.token)
+          if (response.data.sessionId !== undefined) {
+            setCookies('sessionId', response.data.sessionId)
+          }
+          setLocalStorage('router', response.sysMenus.children)
+          remoteRouter(response.sysMenus)
         }
-        setLocalStorage('router', response.sysMenus.children)
-        remoteRouter(response.sysMenus)
+
         resolve(response)
       }).catch(error => {
         reject(error)

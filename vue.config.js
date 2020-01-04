@@ -28,7 +28,7 @@ module.exports = {
   productionSourceMap: false,
   devServer: {
     port: port,
-    open: true,
+    // open: true,//在这里配置，运行npm run dev时会打开2次页面，改为在package.json中添加--open配置
     overlay: {
       warnings: false,
       errors: true

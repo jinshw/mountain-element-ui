@@ -11,7 +11,7 @@
       <el-button type="primary" @click="showQRCode">获取二维码</el-button>
       <el-input v-model="qcodeText" auto-complete="off" />
     </el-row>
-    <div ref="qrcodeContainer" class="qrcode" />
+    <div id="qrcode" ref="qrcodeContainer" class="qrcode" />
   </div>
 </template>
 <script>
@@ -34,7 +34,7 @@ export default {
       })
     },
     showQRCode() {
-      var qrcode2 = new QRCode(this.$refs.qrcodeContainer, {
+      var qrcode = new QRCode('qrcode', {
         text: this.qcodeText,
         width: 400,
         height: 400,
@@ -42,6 +42,7 @@ export default {
         colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H
       })
+      console.log(qrcode)
     }
   }
 
