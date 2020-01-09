@@ -26,6 +26,14 @@ service.interceptors.request.use(
     if (sessionId != null && sessionId !== undefined) {
       config.headers['token'] = sessionId
     }
+
+    if (config.url === '/file/upload') {
+      config.headers['Content-Type'] = 'multipart/form-data'
+    } else if (config.url === '/file/fileDownLoad') {
+      config.responseType = 'blob'
+      config.headers['Content-Type'] = 'application/json;charset=UTF-8'
+    }
+
     return config
   },
   error => {
@@ -49,9 +57,12 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    const headers = response.headers
+    const contentType = headers['content-type']
+    if (contentType === 'application/octet-stream;charset=utf-8' || contentType === 'application/fore-download') {
+      console.log(headers)
+      return response
+    } else if (res.code !== 20000) { // if the custom code is not 20000, it is judged as an error.
       // Message({
       //   message: res.message || 'Error',
       //   type: 'error',

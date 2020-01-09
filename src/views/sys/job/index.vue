@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="d2-mt-0">定时任务</h1>
-    <div id="test">
+    <div>
 
       <div id="top">
         <el-button type="primary" @click="search">查询</el-button>
@@ -65,7 +65,7 @@
           />
 
           <el-table-column label="操作" width="300">
-            <template scope="scope">
+            <template slot-scope="scope">
               <el-button
                 size="small"
                 type="warning"
