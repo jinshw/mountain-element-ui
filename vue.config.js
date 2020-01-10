@@ -1,4 +1,5 @@
 'use strict'
+const glob = require('glob')
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
 
@@ -12,8 +13,34 @@ const name = defaultSettings.title || 'vue Admin Template' // page title
 // For example, Mac: sudo npm run
 const port = 9528 // dev port
 
+// 配置pages多页面获取当前文件夹下的html和js
+function getEntry(globPath) {
+  const entries = {}; let tmp; const htmls = {}
+
+  // 读取src/pages/**/底下所有的html文件
+  glob.sync(globPath + 'html').forEach(function(entry) {
+    tmp = entry.split('/').splice(-3)
+    htmls[tmp[1]] = entry
+  })
+
+  // 读取src/pages/**/底下所有的js文件
+  glob.sync(globPath + 'js').forEach(function(entry) {
+    tmp = entry.split('/').splice(-3)
+    entries[tmp[1]] = {
+      entry,
+      template: htmls[tmp[1]] ? htmls[tmp[1]] : 'index.html', //  当前目录没有有html则以共用的public/index.html作为模板
+      filename: tmp[1] + '.html' //  以文件夹名称.html作为访问地址
+    }
+  })
+  console.log(entries)
+  return entries
+}
+const pages = getEntry('./src/pages/**/*.')
+
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
+  pages: pages,
+
   /**
    * You will need to set publicPath if you plan to deploy your site under a sub path,
    * for example GitHub Pages. If you plan to deploy your site to https://foo.github.io/bar/,
@@ -21,7 +48,8 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/mt',
+  // publicPath: process.env.NODE_ENV === 'development' ? '/' : '/mt/',
+  publicPath: '/mt/',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
@@ -57,8 +85,15 @@ module.exports = {
     }
   },
   chainWebpack(config) {
-    config.plugins.delete('preload') // TODO: need test
-    config.plugins.delete('prefetch') // TODO: need test
+    // config.plugins.delete('preload') // TODO: need test
+    // config.plugins.delete('prefetch') // TODO: need test
+
+    // TODO: Remove this workaround once https://github.com/vuejs/vue-cli/issues/2463 is fixed
+    // Remove preload plugins for multi-page build to prevent infinite recursion
+    Object.keys(pages).forEach(page => {
+      config.plugins.delete(`preload-${page}`)
+      config.plugins.delete(`prefetch-${page}`)
+    })
 
     // set svg-sprite-loader
     config.module
@@ -94,43 +129,44 @@ module.exports = {
         config => config.devtool('cheap-source-map')
       )
 
-    config
-      .when(process.env.NODE_ENV !== 'development',
-        config => {
-          config
-            .plugin('ScriptExtHtmlWebpackPlugin')
-            .after('html')
-            .use('script-ext-html-webpack-plugin', [{
-              // `runtime` must same as runtimeChunk name. default is `runtime`
-              inline: /runtime\..*\.js$/
-            }])
-            .end()
-          config
-            .optimization.splitChunks({
-              chunks: 'all',
-              cacheGroups: {
-                libs: {
-                  name: 'chunk-libs',
-                  test: /[\\/]node_modules[\\/]/,
-                  priority: 10,
-                  chunks: 'initial' // only package third parties that are initially dependent
-                },
-                elementUI: {
-                  name: 'chunk-elementUI', // split elementUI into a single package
-                  priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
-                  test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
-                },
-                commons: {
-                  name: 'chunk-commons',
-                  test: resolve('src/components'), // can customize your rules
-                  minChunks: 3, //  minimum common number
-                  priority: 5,
-                  reuseExistingChunk: true
-                }
-              }
-            })
-          config.optimization.runtimeChunk('single')
-        }
-      )
+    // 多页面配置时，启动如下代码，build后的页面访问为空，先注释掉
+    // config
+    //   .when(process.env.NODE_ENV !== 'development',
+    //     config => {
+    //       config
+    //         .plugin('ScriptExtHtmlWebpackPlugin')
+    //         .after('html')
+    //         .use('script-ext-html-webpack-plugin', [{
+    //           // `runtime` must same as runtimeChunk name. default is `runtime`
+    //           inline: /runtime\..*\.js$/
+    //         }])
+    //         .end()
+    //       config
+    //         .optimization.splitChunks({
+    //           chunks: 'all',
+    //           cacheGroups: {
+    //             libs: {
+    //               name: 'chunk-libs',
+    //               test: /[\\/]node_modules[\\/]/,
+    //               priority: 10,
+    //               chunks: 'initial' // only package third parties that are initially dependent
+    //             },
+    //             elementUI: {
+    //               name: 'chunk-elementUI', // split elementUI into a single package
+    //               priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
+    //               test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
+    //             },
+    //             commons: {
+    //               name: 'chunk-commons',
+    //               test: resolve('src/components'), // can customize your rules
+    //               minChunks: 3, //  minimum common number
+    //               priority: 5,
+    //               reuseExistingChunk: true
+    //             }
+    //           }
+    //         })
+    //       config.optimization.runtimeChunk('single')
+    //     }
+    //   )
   }
 }
