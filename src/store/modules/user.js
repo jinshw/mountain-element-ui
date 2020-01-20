@@ -59,6 +59,7 @@ const actions = {
 
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
+        commit('SET_AVATAR', 'static/image/head-img.png')
         resolve(data)
       }).catch(error => {
         reject(error)
