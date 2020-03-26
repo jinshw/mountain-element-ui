@@ -51,3 +51,17 @@ export function editUser(data) {
     data
   })
 }
+export function resetPassword(data) {
+  return request({
+    url: '/sysuser/resetPassword',
+    method: 'post',
+    data
+  })
+}
+export function modifyPassword(data) {
+  return request({
+    url: '/sysuser/modifyPassword',
+    method: 'post',
+    data
+  })
+}

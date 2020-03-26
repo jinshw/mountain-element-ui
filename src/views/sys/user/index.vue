@@ -87,6 +87,7 @@
           <el-button type="text" size="small">查看</el-button>
           <el-button type="text" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button type="text" size="small" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          <el-button type="text" size="small" @click="resetPassword(scope.$index, scope.row)">重置密码</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -96,7 +97,7 @@
 <script>
 // import util from '@/libs/util.js'
 // import { getToken } from '@/utils/auth'
-import { deleteUser, editUser } from '@/api/user'
+import { deleteUser, editUser, resetPassword } from '@/api/user'
 import { getList } from '@/api/role'
 
 // import qs from 'qs'
@@ -227,6 +228,35 @@ export default {
           that.addDialogVisible = false
         }
       })
+    },
+    resetPassword: function(index, row) {
+      var that = this
+      this.$confirm('重置该用户密码, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          resetPassword({ userId: row.userId }).then(response => {
+            if (response.status === 200) {
+              that.$message({
+                type: 'success',
+                message: '执行成功'
+              })
+            } else {
+              that.$message({
+                type: 'error',
+                message: '执行失败'
+              })
+            }
+          })
+        })
+        .catch(() => {
+          that.$message({
+            type: 'info',
+            message: '已经取消'
+          })
+        })
     },
     commitEvent: function(userRef) {
       var that = this
