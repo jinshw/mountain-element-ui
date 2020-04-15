@@ -1,4 +1,4 @@
-import { login, logout, getInfo, getList, addUser } from '@/api/user'
+import { login, logout, getInfo, addUser, listPage } from '@/api/user'
 import { getToken, setToken, setCookies, removeToken, setLocalStorage, removeLocalStorage } from '@/utils/auth'
 import { resetRouter, remoteRouter } from '@/router'
 
@@ -96,9 +96,9 @@ const actions = {
   list({ commit }, params) {
     // const { username, password } = params
     return new Promise((resolve, reject) => {
-      getList(params).then(response => {
+      // getList(params).then(response => {
+      listPage(params).then(response => {
         const { data } = response
-        console.log('list.......', data)
         resolve(data)
       }).catch(error => {
         reject(error)

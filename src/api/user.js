@@ -65,3 +65,10 @@ export function modifyPassword(data) {
     data
   })
 }
+export function listPage(data) {
+  return request({
+    url: '/sysuser/listPage',
+    method: 'post',
+    data
+  })
+}
