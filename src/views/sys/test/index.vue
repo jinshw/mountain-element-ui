@@ -3,7 +3,7 @@
     <h1 class="d2-mt-0">测试页面</h1>
     <el-row>
       <el-button @click="getAge">getAge</el-button>
-      <el-button type="primary">主要按钮</el-button>
+      <el-button type="primary" @click="pushServer">发布iserver服务</el-button>
       <el-button type="success">成功按钮</el-button>
       <el-button type="info">信息按钮</el-button>
       <el-button type="warning">警告按钮</el-button>
@@ -149,6 +149,24 @@ export default {
         }
       }
       return result
+    },
+
+    pushServer() {
+      var that = this
+      this.$confirm('确认要发布服务?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          console.log('pushServer...')
+        })
+        .catch(() => {
+          that.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
     }
 
   }

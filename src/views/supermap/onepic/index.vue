@@ -18,14 +18,15 @@ export default {
   methods: {
     addMap() {
       var url = 'https://iserver.supermap.io/iserver/services/map-world/rest/maps/World'
+      // var url = 'http://localhost:8090/iserver/services/map-zhdt/rest/maps/综合地图'
       var map = L.map('map', {
-        center: [44.117083893, 87.0095617865],
+        center: [43.117083893, 87.9295617865],
         crs: L.CRS.EPSG4326,
         preferCanvas: true,
         worldCopyJump: true,
         minZoom: 1,
         maxZoom: 18,
-        zoom: 3
+        zoom: 5
       })
       L.supermap.tiledMapLayer(url, { noWrap: true }).addTo(map)
     }
